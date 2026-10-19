@@ -1,0 +1,13 @@
+TestFireLash.class
+PokemonTrainer.class
+Pokemon\AttackTypeHelper.class
+Main.class
+Pokemon\FirePokemon.class
+Pokemon\WaterPokemon.class
+Pokemon\Pokemon.class
+PokemonGymOwner.class
+PokemonGymImpl.class
+Pokemon\ElectricPokemon.class
+TestRainDance.class
+Pokemon\GrassPokemon.class
+PokemonGym.class

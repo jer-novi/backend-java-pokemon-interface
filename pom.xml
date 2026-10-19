@@ -1,0 +1,22 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+           https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>pokemon-interfaces</artifactId>
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+    </properties>
+    <build><sourceDirectory>src</sourceDirectory></build>
+    <version>1.0</version>
+    <packaging>
+        jar
+    </packaging>
+
+    <name>REST Service Parent</name>
+    <description>Parent POM voor REST service tutorial</description>
+
+
+</project>
