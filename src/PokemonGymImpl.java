@@ -73,7 +73,6 @@ public class PokemonGymImpl implements PokemonGym {
         } else if (gymPokemon.getHp() <= 0){
             System.out.println(pokemon.getName() + " has defeated " + gymPokemon.getName());
         }
-
         System.out.println("Would you like to keep playing? yes or no");
         String keepPlaying = speler_A.nextLine();
         if (keepPlaying.equals("yes")){
