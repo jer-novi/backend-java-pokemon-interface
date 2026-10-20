@@ -5,11 +5,16 @@ import java.util.List;
 
 public class FirePokemon extends Pokemon {
 
-    private static final String TYPE = "fire";
+    private static final PokemonType TYPE = PokemonType.FIRE;
     private final List<String> attacks = Arrays.asList("fireLash", "flameThrower", "pyroBall", "inferno");
 
-    public FirePokemon(String name, int level, int hp, String food, String sound) {
-        super(name, level, hp, food, sound, TYPE);
+    public FirePokemon(String attacker, int level, int hp, String food, String sound) {
+        super(attacker, level, hp, food, sound, TYPE);
+    }
+
+    @Override
+    public FirePokemon copy() {
+        return new FirePokemon(getName(), getLevel(), getHp(), getFood(), getSound());
     }
 
     public List<String> getAttacks() {
@@ -17,19 +22,19 @@ public class FirePokemon extends Pokemon {
     }
 
     public void fireLash(Pokemon name, Pokemon enemy) {
-        AttackTypeHelper.attack(name, enemy, 34, 25, 18, 12, "fireLash");
+        AttackTypeHelper.attackAndReport(name, enemy, 34, 25, 18, 12, "fireLash");
     }
 
     public void flameThrower(Pokemon name, Pokemon enemy) {
-        AttackTypeHelper.attack(name, enemy, 42, 31, 22, 14, "flameThrower");
+        AttackTypeHelper.attackAndReport(name, enemy, 42, 31, 22, 14, "flameThrower");
     }
 
     public void pyroBall(Pokemon name, Pokemon enemy) {
-        AttackTypeHelper.attack(name, enemy, 50, 37, 26, 16, "pyroBall");
+        AttackTypeHelper.attackAndReport(name, enemy, 50, 37, 26, 16, "pyroBall");
     }
 
     public void inferno(Pokemon name, Pokemon enemy) {
-        AttackTypeHelper.attack(name, enemy, 58, 44, 31, 19, "inferno");
+        AttackTypeHelper.attackAndReport(name, enemy, 58, 44, 31, 19, "inferno");
     }
 
     }

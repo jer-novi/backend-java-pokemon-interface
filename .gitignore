@@ -2,3 +2,6 @@
 out
 backend-java-pokemon-interface.iml
 5backend-java-pokemon-interface.iml
+target
+divoom_state.json
+pokemon_savegame.txt

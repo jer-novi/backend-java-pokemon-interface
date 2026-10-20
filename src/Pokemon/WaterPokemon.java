@@ -5,11 +5,16 @@ import java.util.List;
 
 public class WaterPokemon extends Pokemon {
 
-    private static final String TYPE = "water";
+    private static final PokemonType TYPE = PokemonType.WATER;
     private final List<String> attacks = Arrays.asList("surf", "hydroPump", "hydroCanon", "rainDance");
 
-    public WaterPokemon(String name, int level, int hp, String food, String sound) {
-        super(name, level, hp, food, sound, TYPE);
+    public WaterPokemon(String attacker, int level, int hp, String food, String sound) {
+        super(attacker, level, hp, food, sound, TYPE);
+    }
+
+    @Override
+    public WaterPokemon copy() {
+        return new WaterPokemon(getName(), getLevel(), getHp(), getFood(), getSound());
     }
 
     public List<String> getAttacks() {
@@ -17,22 +22,22 @@ public class WaterPokemon extends Pokemon {
     }
 
     public void surf(Pokemon name, Pokemon enemy) {
-        AttackTypeHelper.attack(name, enemy, 18, 10, 24, 32, "surf");
+        AttackTypeHelper.attackAndReport(name, enemy, 18, 10, 24, 32, "surf");
     }
 
     public void hydroPump(Pokemon name, Pokemon enemy) {
-        AttackTypeHelper.attack(name, enemy, 26, 14, 35, 47, "hydroPump");
+        AttackTypeHelper.attackAndReport(name, enemy, 26, 14, 35, 47, "hydroPump");
     }
 
     public void hydroCanon(Pokemon name, Pokemon enemy) {
-        AttackTypeHelper.attack(name, enemy, 34, 19, 46, 60, "hydroCanon");
+        AttackTypeHelper.attackAndReport(name, enemy, 34, 19, 46, 60, "hydroCanon");
     }
 
     public void rainDance(Pokemon name, Pokemon enemy) {
-        if (enemy.getType().equals("electric")) {
-            System.out.println("Has no effect on " + enemy.getName());
+        if (enemy.getPokemonType() == PokemonType.ELECTRIC) {
+            AttackTypeHelper.report(AttackResult.noEffect(name, enemy, "rainDance"));
         } else {
-            AttackTypeHelper.attack(name, enemy, -10, 5, 0, 15, "rainDance");
+            AttackTypeHelper.attackAndReport(name, enemy, -10, 5, 0, 15, "rainDance");
 
         }
     }

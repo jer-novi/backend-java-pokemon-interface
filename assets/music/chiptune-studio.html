@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Pokémon 8-Bit Chiptune Studio (Java Code Generator)</title>
+    <style>
+        :root {
+            --bg: #12161f;
+            --card: #1d2331;
+            --accent: #ffcc00;
+            --cyan: #00e5ff;
+            --green: #00e676;
+            --red: #ff5252;
+            --text: #eef2f7;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, monospace;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: var(--accent);
+            margin-bottom: 4px;
+            text-shadow: 0 2px 10px rgba(255, 204, 0, 0.3);
+        }
+        .subtitle {
+            color: var(--cyan);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1150px;
+            width: 100%;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid #2e384d;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 1.15rem;
+            color: var(--cyan);
+            border-bottom: 1px solid #2e384d;
+            padding-bottom: 10px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        button {
+            background: #2b3548;
+            color: white;
+            border: 1px solid #455473;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.15s;
+        }
+        button:hover {
+            background: #3a4760;
+            transform: translateY(-1px);
+        }
+        button.play {
+            background: var(--green);
+            color: #000;
+            border: none;
+        }
+        button.stop {
+            background: var(--red);
+            color: #fff;
+            border: none;
+        }
+        button.preset {
+            background: #252f42;
+            font-size: 0.85rem;
+        }
+        textarea {
+            width: 100%;
+            height: 290px;
+            background: #0d1017;
+            color: #7ee787;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13.5px;
+            line-height: 1.45;
+            box-sizing: border-box;
+        }
+        .piano {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+        }
+        .key {
+            padding: 10px 11px;
+            background: #f8f9fa;
+            color: #111;
+            border-radius: 6px;
+            font-family: monospace;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            text-align: center;
+            min-width: 48px;
+            border-bottom: 4px solid #adb5bd;
+        }
+        .key.sharp {
+            background: #212529;
+            color: #fff;
+            border-bottom: 4px solid #000;
+        }
+        .key.rest {
+            background: var(--accent);
+            color: #000;
+            border-bottom: 4px solid #c79f00;
+        }
+        .key:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+        .key span {
+            display: block;
+            font-size: 0.72rem;
+            opacity: 0.75;
+        }
+        .active-note {
+            margin-top: 12px;
+            padding: 12px;
+            background: #0d1017;
+            border-radius: 8px;
+            font-family: monospace;
+            color: var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 0;
+            font-size: 0.9rem;
+        }
+        input[type="range"] {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎮 Pokémon 8-Bit Chiptune Studio</h1>
+    <div class="subtitle">Luister, bewerk en genereer direct de <code>int[][]</code> Java-code voor <code>SoundEngine.java</code>!</div>
+
+    <div class="container">
+        <!-- Linkerkolom: Editor & Speler -->
+        <div class="card">
+            <h2>1. Java Array Editor (plak of bewerk hier je <code>{Hz, ms}</code> paren)</h2>
+            <div class="controls">
+                <button class="play" onclick="playTune(false)">▶ Speel 1x Af</button>
+                <button class="play" onclick="playTune(true)">🔁 Loop (zoals in Gym)</button>
+                <button class="stop" onclick="stopTune()">⏹ Stop</button>
+                <button onclick="copyJavaCode()">📋 Kopieer Java Code</button>
+            </div>
+
+            <div class="controls">
+                <span style="align-self:center; font-size:0.85rem; opacity:0.8;">Presets:</span>
+                <button class="preset" onclick="loadPreset('gym')">⚔️ Gym Battle Theme</button>
+                <button class="preset" onclick="loadPreset('pallet')">🏠 Pallet Town / Intro</button>
+                <button class="preset" onclick="loadPreset('victory')">🏆 Victory Fanfare</button>
+                <button class="preset" onclick="loadPreset('heal')">🏥 Pokémon Center Heal</button>
+            </div>
+
+            <textarea id="codeArea" spellcheck="false">int[][] gymTheme = {
+    // Intro arpeggio (spannende opbouw)
+    {392, 90}, {494, 90}, {587, 90}, {784, 90},
+    {392, 90}, {494, 90}, {587, 90}, {784, 90},
+    // Hoofdthema (Gym Leader Battle)
+    {659, 180}, {587, 180}, {523, 180}, {587, 180},
+    {659, 180}, {659, 180}, {659, 280}, {0, 80},
+    {587, 180}, {587, 180}, {587, 280}, {0, 80},
+    {659, 180}, {784, 180}, {784, 280}, {0, 80},
+    // Tweede maat
+    {659, 180}, {587, 180}, {523, 180}, {587, 180},
+    {659, 180}, {659, 180}, {659, 180}, {523, 180},
+    {587, 180}, {587, 180}, {659, 180}, {587, 180},
+    {523, 360}, {0, 180},
+    // Snelle bas-sectie
+    {330, 120}, {392, 120}, {440, 120}, {494, 120},
+    {523, 240}, {494, 240}, {440, 240}, {392, 240}
+};</textarea>
+
+            <div class="active-note">
+                <span id="statusText">Klaar om af te spelen...</span>
+                <span id="freqText">-- Hz</span>
+            </div>
+        </div>
+
+        <!-- Rechterkolom: Interactief 8-Bit Toetsenbord & Noot-toevoeger -->
+        <div class="card">
+            <h2>2. Interactief 8-Bit Toetsenbord (Klik om te horen & toe te voegen)</h2>
+            
+            <div class="slider-row">
+                <label>Standaard nootduur: <strong id="durLabel">180</strong> ms</label>
+                <input type="range" id="noteDuration" min="50" max="600" step="10" value="180" oninput="document.getElementById('durLabel').innerText = this.value">
+            </div>
+
+            <div class="slider-row">
+                <label>Tempo snelheid: <strong id="tempoLabel">1.0x</strong></label>
+                <input type="range" id="tempoMultiplier" min="0.5" max="2.0" step="0.1" value="1.0" oninput="document.getElementById('tempoLabel').innerText = this.value + 'x'">
+            </div>
+
+            <div class="slider-row">
+                <label><input type="checkbox" id="appendMode" checked> Klikken op een noot voegt hem meteen toe aan de code hiernaast!</label>
+            </div>
+
+            <div class="piano" id="pianoKeys"></div>
+
+            <h2 style="margin-top:24px;">Hoe werkt dit?</h2>
+            <ul style="font-size: 0.9rem; line-height: 1.6; padding-left: 20px; color: #cbd5e1;">
+                <li>Elke <code>{Hz, ms}</code> in de lijst links is 1 noot in Java.</li>
+                <li>De synthesizer gebruikt exact dezelfde <strong>8-bit Square Wave (blokgolf)</strong> als <code>SoundEngine.java</code>.</li>
+                <li>Klik op een pianotoets hierboven om de toon te testen of aan je melodie toe te voegen.</li>
+                <li>Tevreden? Klik op <strong>📋 Kopieer Java Code</strong> en plak hem in <code>SoundEngine.java</code>!</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const notes = [
+            { name: 'C4', hz: 262, sharp: false },
+            { name: 'C#4', hz: 277, sharp: true },
+            { name: 'D4', hz: 294, sharp: false },
+            { name: 'D#4', hz: 311, sharp: true },
+            { name: 'E4', hz: 330, sharp: false },
+            { name: 'F4', hz: 349, sharp: false },
+            { name: 'F#4', hz: 370, sharp: true },
+            { name: 'G4', hz: 392, sharp: false },
+            { name: 'G#4', hz: 415, sharp: true },
+            { name: 'A4', hz: 440, sharp: false },
+            { name: 'A#4', hz: 466, sharp: true },
+            { name: 'B4', hz: 494, sharp: false },
+            { name: 'C5', hz: 523, sharp: false },
+            { name: 'C#5', hz: 554, sharp: true },
+            { name: 'D5', hz: 587, sharp: false },
+            { name: 'D#5', hz: 622, sharp: true },
+            { name: 'E5', hz: 659, sharp: false },
+            { name: 'F5', hz: 698, sharp: false },
+            { name: 'F#5', hz: 740, sharp: true },
+            { name: 'G5', hz: 784, sharp: false },
+            { name: 'G#5', hz: 830, sharp: true },
+            { name: 'A5', hz: 880, sharp: false },
+            { name: 'B5', hz: 987, sharp: false },
+            { name: 'C6', hz: 1046, sharp: false },
+            { name: 'RUST', hz: 0, rest: true }
+        ];
+
+        const presets = {
+            gym: `int[][] gymTheme = {
+    // Intro arpeggio (spannende opbouw)
+    {392, 90}, {494, 90}, {587, 90}, {784, 90},
+    {392, 90}, {494, 90}, {587, 90}, {784, 90},
+    // Hoofdthema (Gym Leader Battle)
+    {659, 180}, {587, 180}, {523, 180}, {587, 180},
+    {659, 180}, {659, 180}, {659, 280}, {0, 80},
+    {587, 180}, {587, 180}, {587, 280}, {0, 80},
+    {659, 180}, {784, 180}, {784, 280}, {0, 80},
+    // Tweede maat
+    {659, 180}, {587, 180}, {523, 180}, {587, 180},
+    {659, 180}, {659, 180}, {659, 180}, {523, 180},
+    {587, 180}, {587, 180}, {659, 180}, {587, 180},
+    {523, 360}, {0, 180},
+    // Snelle bas-sectie
+    {330, 120}, {392, 120}, {440, 120}, {494, 120},
+    {523, 240}, {494, 240}, {440, 240}, {392, 240}
+};`,
+            pallet: `int[][] gymTheme = {
+    // Rustige Pallet Town / Route 1 melodie
+    {587, 220}, {523, 220}, {494, 220}, {440, 220},
+    {392, 440}, {659, 220}, {587, 220},
+    {523, 440}, {494, 220}, {440, 220},
+    {392, 440}, {0, 150},
+    {440, 220}, {494, 220}, {523, 220}, {587, 220},
+    {659, 440}, {587, 220}, {523, 220},
+    {587, 600}, {0, 200}
+};`,
+            victory: `int[][] victoryTheme = {
+    // Klassieke Pokémon Victory Fanfare!
+    {523, 100}, {0, 25}, {523, 100}, {0, 25}, {523, 100}, {0, 25},
+    {523, 260}, {0, 40},
+    {415, 220}, {466, 220},
+    {523, 160}, {0, 30}, {466, 90}, {523, 500}
+};`,
+            heal: `int[][] healJingle = {
+    // Pokémon Center 5-noten Healing Jingle!
+    {987, 150}, {0, 40},
+    {987, 150}, {0, 40},
+    {987, 150}, {0, 40},
+    {830, 150}, {0, 40},
+    {1318, 400}
+};`
+        };
+
+        let audioCtx = null;
+        let isPlaying = false;
+
+        // Bouw de pianoknoppen op
+        const pianoContainer = document.getElementById('pianoKeys');
+        notes.forEach(n => {
+            const btn = document.createElement('div');
+            btn.className = 'key' + (n.sharp ? ' sharp' : '') + (n.rest ? ' rest' : '');
+            btn.innerHTML = `${n.name}<span>${n.hz} Hz</span>`;
+            btn.onclick = () => {
+                const dur = parseInt(document.getElementById('noteDuration').value, 10);
+                playSingleSquareNote(n.hz, dur);
+                if (document.getElementById('appendMode').checked) {
+                    appendNoteToCode(n.hz, dur);
+                }
+            };
+            pianoContainer.appendChild(btn);
+        });
+
+        function ensureAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSingleSquareNote(hz, durationMs) {
+            ensureAudio();
+            document.getElementById('freqText').innerText = `${hz} Hz (${durationMs} ms)`;
+            if (hz <= 0) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square'; // Echte 8-bit GameBoy blokgolf!
+            osc.frequency.setValueAtTime(hz, audioCtx.currentTime);
+
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + durationMs / 1000);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + durationMs / 1000);
+        }
+
+        function parseNotesFromText(text) {
+            const regex = /\{\s*(\d+)\s*,\s*(\d+)\s*\}/g;
+            const list = [];
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+                list.push({ hz: parseInt(match[1], 10), ms: parseInt(match[2], 10) });
+            }
+            return list;
+        }
+
+        async function playTune(loop) {
+            stopTune();
+            ensureAudio();
+            isPlaying = true;
+
+            do {
+                const sequence = parseNotesFromText(document.getElementById('codeArea').value);
+                if (sequence.length === 0) break;
+
+                for (let i = 0; i < sequence.length; i++) {
+                    if (!isPlaying) break;
+                    const tempo = parseFloat(document.getElementById('tempoMultiplier').value);
+                    const hz = sequence[i].hz;
+                    const ms = Math.round(sequence[i].ms / tempo);
+
+                    document.getElementById('statusText').innerText = `Speelt noot ${i + 1} van ${sequence.length}...`;
+                    playSingleSquareNote(hz, ms);
+                    await new Promise(r => setTimeout(r, ms + 20));
+                }
+            } while (loop && isPlaying);
+
+            if (isPlaying) {
+                document.getElementById('statusText').innerText = 'Klaar!';
+                isPlaying = false;
+            }
+        }
+
+        function stopTune() {
+            isPlaying = false;
+            document.getElementById('statusText').innerText = 'Gestopt.';
+        }
+
+        function appendNoteToCode(hz, ms) {
+            const area = document.getElementById('codeArea');
+            const trimmed = area.value.trimEnd();
+            if (trimmed.endsWith('};')) {
+                area.value = trimmed.slice(0, -2).trimEnd() + `, {${hz}, ${ms}}\n};`;
+            } else {
+                area.value += `\n{${hz}, ${ms}},`;
+            }
+        }
+
+        function loadPreset(name) {
+            stopTune();
+            document.getElementById('codeArea').value = presets[name];
+        }
+
+        function copyJavaCode() {
+            const area = document.getElementById('codeArea');
+            navigator.clipboard.writeText(area.value);
+            document.getElementById('statusText').innerText = '✅ Java-code gekopieerd naar klembord!';
+        }
+    </script>
+</body>
+</html>

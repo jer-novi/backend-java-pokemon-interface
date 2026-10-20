@@ -1,31 +1,34 @@
 package Pokemon;
 
 final class AttackTypeHelper {
-    static void attack(Pokemon name, Pokemon enemy, int damageGrass, int damageWater, int damageElectric, int damageFire, String attackName) {
-        System.out.println(name.getName() + " attacks " + enemy.getName() + " with " + attackName);
-        int damage = 0;
+
+    /** Voert de aanval uit en geeft het resultaat terug. Print niets. */
+    static AttackResult attack(Pokemon name, Pokemon enemy, int damageGrass, int damageWater, int damageElectric, int damageFire, String attackName) {
         int preAttackHp = enemy.getHp();
-        switch (enemy.getType()) {
-            case "grass" -> damage = damageGrass;
 
-            case "water" -> damage = damageWater;
+        int damage = switch (enemy.getPokemonType()) {
+            case GRASS -> damageGrass;
+            case WATER -> damageWater;
+            case ELECTRIC -> damageElectric;
+            case FIRE -> damageFire;
+        };
 
-            case "electric" -> damage = damageElectric;
+        // negatieve damage = boost
+        enemy.setHp(preAttackHp - damage);
 
-            case "fire" -> damage = damageFire;
-        }
-        if (damage > 0) {
-            damage = Math.min(preAttackHp, damage);
-            System.out.println(enemy.getName() + " loses " + damage + " hp");
-            enemy.setHp(enemy.getHp() - damage);
-        } else if (damage == 0) {
-            System.out.println(enemy.getName() + " is not affected by  " + attackName );
-        } else {
-            int boost = Math.abs(damage);
-            System.out.println(enemy.getName() + " gains " + boost + " hp");
-            enemy.setHp(enemy.getHp() + boost);
-        }
-        System.out.println(enemy.getName() + "'s remaining hp is " + enemy.getHp());
+        int hpChange = enemy.getHp() - preAttackHp;
+        return new AttackResult(name.getName(), enemy.getName(), attackName, hpChange, enemy.getHp(), false);
+    }
 
+    /** Voert de aanval uit en print het resultaat. Tijdelijk, tot er een I/O-interface is. */
+    static AttackResult attackAndReport(Pokemon name, Pokemon enemy, int damageGrass, int damageWater, int damageElectric, int damageFire, String attackName) {
+        AttackResult result = attack(name, enemy, damageGrass, damageWater, damageElectric, damageFire, attackName);
+        report(result);
+        return result;
+    }
+
+    /** Print een resultaat. Tijdelijk, tot er een I/O-interface is. */
+    static void report(AttackResult result) {
+        result.describe().forEach(System.out::println);
     }
 }
