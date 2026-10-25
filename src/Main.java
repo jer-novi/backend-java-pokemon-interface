@@ -1,3 +1,9 @@
+import Pokemon.ElectricPokemon;
+import Pokemon.FirePokemon;
+import Pokemon.GrassPokemon;
+import Pokemon.Pokemon;
+import Pokemon.WaterPokemon;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
